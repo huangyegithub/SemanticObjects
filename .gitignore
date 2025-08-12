@@ -18,3 +18,4 @@ CLAUDE.md
 *.log
 *.md
 *.pdf
+.gitignore
