@@ -161,6 +161,7 @@ class Main : CliktCommand() {
         }
 
         val repl = REPL( Settings(verbose, materialize, outdir.toString(), tripleStoreUrl, backgr, domainPrefix, extraPrefixes=HashMap(extra), useQueryType = queryType, reasoner = reasonerMode))
+        // The input variable is the geological model file (simulate_onto.smol).
         if(input.isNotEmpty()){
             if(input.size == 1) repl.command("read", input[0].toString())
             if(input.size > 1) repl.command("multiread", input.joinToString(";"))

@@ -2404,12 +2404,30 @@ untitled-ontology-38:siliciclastic_rock rdf:type owl:Class ;
                                         rdfs:subClassOf UFRGS:GeoReservoirOntology_sedimentary_rock ;
                                         rdfs:label "siliciclastic rock"@en .
 
+### NEW EVAPORITE START ###
+
+###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#evaporite
+untitled-ontology-38:evaporite rdf:type owl:Class ;
+    rdfs:subClassOf UFRGS:GeoReservoirOntology_sedimentary_rock ;
+    rdfs:comment "Chemical sedimentary rock formed by evaporation of saline water"@en ;
+    rdfs:label "evaporite"@en .
+
+### NEW EVAPORITE END ###
 
 ###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#source_rock
 untitled-ontology-38:source_rock rdf:type owl:Class ;
                                  rdfs:subClassOf obo:BFO_0000023 ;
                                  rdfs:label "source rock"@en .
 
+### NEW CRYSTALLINE BASEMENT ROCKS START ###
+
+###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#granite_gneiss
+untitled-ontology-38:granite_gneiss rdf:type owl:Class ;
+    rdfs:subClassOf UFRGS:GeoCoreOntology_rock ;
+    rdfs:comment "Crystalline basement rocks including granite and gneiss"@en ;
+    rdfs:label "granite gneiss"@en .
+
+### NEW CRYSTALLINE BASEMENT ROCKS END ###
 
 ###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#temperature
 untitled-ontology-38:temperature rdf:type owl:Class ;
@@ -2422,19 +2440,74 @@ untitled-ontology-38:tensile_strength rdf:type owl:Class ;
                                       rdfs:subClassOf obo:BFO_0000019 ;
                                       rdfs:label "tensile strength"@en .
 
+### NEW QUALITIES START ###
+
+###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#salinity
+untitled-ontology-38:salinity rdf:type owl:Class ;
+    rdfs:subClassOf obo:BFO_0000019 ;
+    rdfs:comment "Salinity of fluid, measured in wt percent NaCl equivalent"@en ;
+    rdfs:label "salinity"@en .
+
+###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#oxidising_environment
+untitled-ontology-38:oxidising_environment rdf:type owl:Class ;
+    rdfs:subClassOf obo:BFO_0000019 ;
+    rdfs:label "oxidising environment"@en .
+
+###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#reducing_environment
+untitled-ontology-38:reducing_environment rdf:type owl:Class ;
+    rdfs:subClassOf obo:BFO_0000019 ;
+    rdfs:label "reducing environment"@en .
+
+### NEW QUALITIES END ###
 
 ###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#thermal_maturation_process
 untitled-ontology-38:thermal_maturation_process rdf:type owl:Class ;
                                                 rdfs:subClassOf UFRGS:GeoCoreOntology_geological_process ;
                                                 rdfs:label "thermal maturation"@en .
 
+### NEW PROCESSES START ###
+
+###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#vein_formation_process
+untitled-ontology-38:vein_formation_process rdf:type owl:Class ;
+    rdfs:subClassOf UFRGS:GeoCoreOntology_geological_process ;
+    rdfs:label "vein formation process"@en .
+
+###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#copper_precipitation_process
+untitled-ontology-38:copper_precipitation_process rdf:type owl:Class ;
+    rdfs:subClassOf UFRGS:GeoCoreOntology_geological_process ;
+    rdfs:label "copper precipitation process"@en .
+
+### NEW PROCESSES END ###
 
 ###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#thermal_maturation_trigger
 domain:thermal_maturation_trigger rdf:type owl:Class ;
-                                                rdfs:subClassOf untitled-ontology-38:trigger ;
-                                                rdfs:comment "datavalue unit: degrees Celsius"@en ;
-                                                rdfs:label "thermal maturation trigger"@en .
+                                  rdfs:subClassOf untitled-ontology-38:trigger ;
+                                  rdfs:comment "datavalue unit: degrees Celsius"@en ;
+                                  rdfs:label "thermal maturation trigger"@en .
 
+### NEW TRIGGERS START ###
+
+###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#redox_environment_trigger
+untitled-ontology-38:redox_environment_trigger rdf:type owl:Class ;
+    rdfs:subClassOf untitled-ontology-38:trigger ;
+    rdfs:comment "Trigger for oxidised copper-bearing fluid encountering reduction front"@en ;
+    rdfs:label "redox environment trigger"@en .
+
+###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#vein_formation_temperature_trigger
+untitled-ontology-38:vein_formation_temperature_trigger rdf:type owl:Class ;
+    rdfs:subClassOf untitled-ontology-38:trigger ;
+    rdfs:comment "Temperature trigger for vein formation at 150 degrees Celsius"@en ;
+    rdfs:comment "datavalue unit: degrees Celsius"@en ;
+    rdfs:label "vein formation temperature trigger"@en .
+
+###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#vein_formation_salinity_trigger
+untitled-ontology-38:vein_formation_salinity_trigger rdf:type owl:Class ;
+    rdfs:subClassOf untitled-ontology-38:trigger ;
+    rdfs:comment "Salinity trigger for vein formation at >31 wt percent NaCl equivalent"@en ;
+    rdfs:comment "datavalue unit: wt percent NaCl equivalent"@en ;
+    rdfs:label "vein formation salinity trigger"@en .
+
+### NEW TRIGGERS END ###
 
 ###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#trap
 untitled-ontology-38:trap rdf:type owl:Class ;
@@ -2452,6 +2525,15 @@ untitled-ontology-38:water rdf:type owl:Class ;
                            rdfs:subClassOf UFRGS:GeoCoreOntology_earth_fluid ;
                            rdfs:label "water"@en .
 
+### NEW FLUID TYPE START ###
+
+###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#brine
+untitled-ontology-38:brine rdf:type owl:Class ;
+    rdfs:subClassOf UFRGS:GeoCoreOntology_earth_fluid ;
+    rdfs:comment "Saline fluid with elevated salt content"@en ;
+    rdfs:label "brine"@en .
+
+### NEW FLUID TYPE START ###
 
 ###  http://www.semanticweb.org/quy/ontologies/2023/2/untitled-ontology-38#UFRGS:GeoReservoirOntology_depositional_unit
 UFRGS:GeoReservoirOntology_depositional_unit rdf:type owl:Class ;
@@ -2738,5 +2820,31 @@ UFRGS:GeoReservoirOntology_sedimentary_rock rdf:type owl:Class ;
               )
 ] .
 
+### NEW COMPLEX CLASS RESTRICTIONS START ###
 
-###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi
+### Complex definition for temperature-triggered vein formation
+[ owl:intersectionOf ( UFRGS:GeoCoreOntology_geological_object
+                       [ rdf:type owl:Restriction ;
+                         owl:onProperty obo:RO_0000086 ;
+                         owl:someValuesFrom [ owl:intersectionOf ( untitled-ontology-38:temperature
+                                                                   [ rdf:type owl:Restriction ;
+                                                                     owl:onProperty untitled-ontology-38:datavalue ;
+                                                                     owl:someValuesFrom [ rdf:type rdfs:Datatype ;
+                                                                                          owl:onDatatype xsd:double ;
+                                                                                          owl:withRestrictions ( [ xsd:minInclusive "150.0"^^xsd:double ]
+                                                                                                               )
+                                                                                        ]
+                                                                   ]
+                                                                 ) ;
+                                              rdf:type owl:Class
+                                            ]
+                       ]
+                     ) ;
+  rdf:type owl:Class ;
+  rdfs:subClassOf [ rdf:type owl:Restriction ;
+                    owl:onProperty obo:RO_0000056 ;
+                    owl:someValuesFrom untitled-ontology-38:vein_formation_temperature_trigger
+                  ]
+] .
+
+### NEW COMPLEX CLASS RESTRICTIONS END ###

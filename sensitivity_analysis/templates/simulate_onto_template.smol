@@ -1,4 +1,46 @@
-// This file contains the geological model implementation.
+// This file contains the geological model implementation with parameterization support.
+// This is a template version for sensitivity analysis with {{PARAMETER_NAME}} placeholders.
+
+// ========================================================================
+// CONFIGURATION CLASS FOR SENSITIVITY ANALYSIS
+// ========================================================================
+// This class centralizes all parameters that were previously hardcoded
+// throughout the simulation, enabling systematic sensitivity analysis
+class SimConfig(
+    // Geological unit sizes (meters)
+    Double shaleSize,        // Base: 20.0
+    Double sandstoneSize,    // Base: 26.5
+    Double torSize,          // Base: 67.5
+    Double ekofiskSize,      // Base: 99.0
+    Double capSize,          // Base: 30.0
+    Double ab1Size,          // Base: 186.0
+    Double ab2Size,          // Base: 98.05
+    
+    // Temperature model parameters
+    Double baseTemperature,  // Base: 2.5 celsius
+    Double tempFactor,       // Base: 30.0 celsius/km
+    
+    // Hydrocarbon migration parameters
+    Double hydrocarbonIncrement,  // Base: 100.0
+    
+    // Temporal parameters (million years)
+    Double startPast,        // Base: 136.0
+    Double checkStart,       // Base: -66.0
+    Double depositionDuration,  // Base: 2.0
+    
+    // Layer counts
+    Int divLayers,           // Base: 31
+    Int torLayers,           // Base: 5
+    Int ekofiskLayers,       // Base: 1
+    Int capLayers,           // Base: 1
+    Int ab1Layers,           // Base: 5
+    Int ab2Layers            // Base: 26
+)
+end
+
+// ========================================================================
+// GEOLOGICAL OBJECT CLASSES (unchanged from original)
+// ========================================================================
 
 abstract class GeoObject (hidden GeoObject above,   // Another geological object
                           hidden GeoObject below,   // Another geological object
@@ -75,8 +117,11 @@ abstract class GeoUnit extends GeoObject (hidden Int mergeId)
     end
 end
 
-// This class represents chalk geological formations. It is modelling hydrocarbon migration through chalk formations, with tracking of organic matter maturation and movement.
-class ChalkUnit extends GeoUnit (List<Double> kerogenUnits)
+// ========================================================================
+// MODIFIED CHALK UNIT WITH CONFIGURATION SUPPORT
+// ========================================================================
+// This class represents chalk geological formations with parameterized hydrocarbon migration
+class ChalkUnit extends GeoUnit (List<Double> kerogenUnits, hidden SimConfig config)
     models "a <http://purl.obolibrary.org/obo/bfo.owl#UFRGS:GeoCoreOntology_geological_object>; <http://purl.obolibrary.org/obo/bfo.owl#UFRGS:GeoCoreOntology_constituted_by> _:fr1. _:fr1 a domain:chalk. ";
 
     override Unit update()
@@ -87,9 +132,9 @@ class ChalkUnit extends GeoUnit (List<Double> kerogenUnits)
             Double next = l.content;
             if next >= 0 then
 
-                // If there is room in the current unit (value + 100 is less than unit size), increases the hydrocarbon content by 100.
-                if next + 100.0 < this.size then
-                    l.content = next + 100;
+                // PARAMETERIZED: Using config.hydrocarbonIncrement instead of hardcoded 100.0
+                if next + this.config.hydrocarbonIncrement < this.size then
+                    l.content = next + this.config.hydrocarbonIncrement;
                 // If there is not enough room
                 else
                     // Checks if there is a unit above and if it acts as a seal/cap
@@ -125,7 +170,7 @@ class ChalkUnit extends GeoUnit (List<Double> kerogenUnits)
 
     // Creates a copy of the ChalkUnit
     override GeoUnit clone()
-        GeoUnit g = new ChalkUnit(null, null, null, null, null, null, this.size, this.mergeId, this.kerogenUnits);
+        GeoUnit g = new ChalkUnit(null, null, null, null, null, null, this.size, this.mergeId, this.kerogenUnits, this.config);
         return g;
     end
 
@@ -142,8 +187,10 @@ class ChalkUnit extends GeoUnit (List<Double> kerogenUnits)
     end
 end
 
-// The main difference between SandstoneUnit and ChalkUnit is in their ontological representation - one is defined as sandstone and the other as chalk. Their behaviour regarding hydrocarbon migration is identical.
-class SandstoneUnit extends GeoUnit (List<Double> kerogenUnits)
+// ========================================================================
+// MODIFIED SANDSTONE UNIT WITH CONFIGURATION SUPPORT
+// ========================================================================
+class SandstoneUnit extends GeoUnit (List<Double> kerogenUnits, hidden SimConfig config)
     models "a <http://purl.obolibrary.org/obo/bfo.owl#UFRGS:GeoCoreOntology_geological_object>; <http://purl.obolibrary.org/obo/bfo.owl#UFRGS:GeoCoreOntology_constituted_by> _:fr1. _:fr1 a domain:sandstone. ";
 
     override Unit update()
@@ -151,8 +198,9 @@ class SandstoneUnit extends GeoUnit (List<Double> kerogenUnits)
         while l != null do
             Double next = l.content;
             if next >= 0 then
-                if next + 100.0 < this.size then
-                    l.content = next + 100;
+                // PARAMETERIZED: Using config.hydrocarbonIncrement instead of hardcoded 100.0
+                if next + this.config.hydrocarbonIncrement < this.size then
+                    l.content = next + this.config.hydrocarbonIncrement;
                 else
                     if this.above != null then
                         Boolean caps = this.above.caps();
@@ -174,7 +222,7 @@ class SandstoneUnit extends GeoUnit (List<Double> kerogenUnits)
     end
 
     override GeoUnit clone()
-        GeoUnit g = new SandstoneUnit(null, null, null, null, null, null, this.size, this.mergeId, this.kerogenUnits);
+        GeoUnit g = new SandstoneUnit(null, null, null, null, null, null, this.size, this.mergeId, this.kerogenUnits, this.config);
         return g;
     end
     override Boolean caps() return False; end
@@ -185,14 +233,16 @@ class SandstoneUnit extends GeoUnit (List<Double> kerogenUnits)
     end
 end
 
-// null, null, null, null, null, null, 40.0, 1, 0.0, True, 0
-class ShaleUnit extends GeoUnit (hidden Double temperature, hidden Boolean hasKerogenSource, hidden Int maturedUnits)
+// ========================================================================
+// MODIFIED SHALE UNIT WITH CONFIGURATION SUPPORT
+// ========================================================================
+class ShaleUnit extends GeoUnit (hidden Double temperature, hidden Boolean hasKerogenSource, hidden Int maturedUnits, hidden SimConfig config)
     models "a <http://purl.obolibrary.org/obo/bfo.owl#UFRGS:GeoReservoirOntology_sedimentary_geological_object>; obo:RO_0001015 _:fr3; <http://purl.obolibrary.org/obo/bfo.owl#UFRGS:GeoCoreOntology_constituted_by> _:fr1; obo:RO_0000086 _:fr2. _:fr1 a domain:shale. _:fr2 domain:datavalue %temperature; a domain:temperature. _:fr3 a domain:amount_of_organic_matter.";
 
     override Unit update()
         Double under = this.getSizeAbove();
-        // Increase temperature based on how much overburden (under) is on top. The more rock layers above, the hotter the shale becomes.
-        this.temperature = 2.5 + ((under/1000) * 30);
+        // PARAMETERIZED: Using config.baseTemperature and config.tempFactor instead of hardcoded 2.5 and 30
+        this.temperature = this.config.baseTemperature + ((under/1000) * this.config.tempFactor);
         if this.maturedUnits > 0 then
             if this.above != null then
                 Boolean caps = this.above.caps();
@@ -211,7 +261,7 @@ class ShaleUnit extends GeoUnit (hidden Double temperature, hidden Boolean hasKe
     end
 
     override GeoUnit clone()
-        GeoUnit g = new ShaleUnit(null, null, null, null, null, null, this.size, this.mergeId, this.temperature, this.hasKerogenSource, this.maturedUnits);
+        GeoUnit g = new ShaleUnit(null, null, null, null, null, null, this.size, this.mergeId, this.temperature, this.hasKerogenSource, this.maturedUnits, this.config);
         return g;
     end
 
@@ -237,7 +287,9 @@ class ShaleUnit extends GeoUnit (hidden Double temperature, hidden Boolean hasKe
     end
 end
 
-
+// ========================================================================
+// DEPOSITION GENERATOR (unchanged from original)
+// ========================================================================
 hidden class DepositionGenerator(GeoUnit emitUnit, Double duration, Int times)
     GeoUnit emit()
         GeoUnit next = this.emitUnit.clone();
@@ -246,9 +298,12 @@ hidden class DepositionGenerator(GeoUnit emitUnit, Double duration, Int times)
     end
 end
 
+// ========================================================================
+// DRIVER CLASS (unchanged from original)
+// ========================================================================
 /*
-Driver is the high-level simulation “controller.” Driver is responsible for:
-1. Initializing the geological column with a given “bottom” rock unit.
+Driver is the high-level simulation "controller." Driver is responsible for:
+1. Initializing the geological column with a given "bottom" rock unit.
 2. Iterating over a sequence of deposition events (represented by DepositionGenerators).
 3. Adding new units onto the top of the existing column, or merging them when possible.
 4. Calling updates on all units from bottom to top (via updateAll).
@@ -257,7 +312,6 @@ Driver is the high-level simulation “controller.” Driver is responsible for:
 */
 
 hidden class Driver(GeoUnit top, GeoUnit bottom)
-    // dl, 136.0, mandal, (-66.0)
    Unit sim(List<DepositionGenerator> actions, Double startPast, GeoUnit init, Double checkStart)
         // "init" is the initial geological unit, often a ShaleUnit at the bottom.
         this.top = init;
@@ -265,7 +319,7 @@ hidden class Driver(GeoUnit top, GeoUnit bottom)
 
         /*
         If startPast = 136.0, then now starts at -136.0.
-        The code uses negative time as a way to say “136 million years ago,” for instance.
+        The code uses negative time as a way to say "136 million years ago," for instance.
         */
         Double now = -1.0 * startPast;
 
@@ -277,14 +331,14 @@ hidden class Driver(GeoUnit top, GeoUnit bottom)
             while dg.times > 0 do
 
                 /*
-                Makes a clone of the generator’s prototype unit (dg.emitUnit). Decrements dg.times by 1.
+                Makes a clone of the generator's prototype unit (dg.emitUnit). Decrements dg.times by 1.
                 So on each iteration, we get a fresh new GeoUnit (e.g., a SandstoneUnit or ShaleUnit) ready to be placed in the geological column.
                 */
                 GeoUnit un = dg.emit();
 
                 /*
                 Check whether the newly created unit can be merged with the current top.
-                canMerge(...) returns true if both units have the same mergeId (defined in GeoUnit), indicating they are of the same “mergeable” type (e.g., same rock layer or same deposit sequence).
+                canMerge(...) returns true if both units have the same mergeId (defined in GeoUnit), indicating they are of the same "mergeable" type (e.g., same rock layer or same deposit sequence).
                 */
                 Boolean bb = this.top.canMerge(un);
 
@@ -324,7 +378,7 @@ hidden class Driver(GeoUnit top, GeoUnit bottom)
 
                 /*
                 "checkStart" is a threshold time. Once "now" exceeds it, the code runs a domain-specific query.
-                This block simulates a scenario where, after a certain time (or geologic period), the shales enter a “window” for generating hydrocarbons.
+                This block simulates a scenario where, after a certain time (or geologic period), the shales enter a "window" for generating hydrocarbons.
                 */
                 if now > checkStart  then
                     List<ShaleUnit> fs = member("<domain:models> some (<obo:RO_0000056> some <domain:oil_window_maturation_trigger>)");
@@ -357,39 +411,76 @@ hidden class Driver(GeoUnit top, GeoUnit bottom)
    end
 end
 
+// ========================================================================
+// PARAMETERIZED MAIN BLOCK WITH PLACEHOLDERS
+// ========================================================================
 main
-    // Create the initial (bottom) geological unit.
-    ShaleUnit mandal = new ShaleUnit(null, null, null, null, null, null, 20.0, 1, 0.0, True, 0);
+    // Create configuration with all parameters (using placeholders)
+    SimConfig config = new SimConfig(
+        // Geological unit sizes
+        {{SHALE_SIZE}},         // shaleSize
+        {{SANDSTONE_SIZE}},     // sandstoneSize
+        {{TOR_SIZE}},           // torSize
+        {{EKOFISK_SIZE}},       // ekofiskSize
+        {{CAP_SIZE}},           // capSize
+        {{AB1_SIZE}},           // ab1Size
+        {{AB2_SIZE}},           // ab2Size
+        
+        // Temperature model
+        {{BASE_TEMPERATURE}},   // baseTemperature
+        {{TEMP_FACTOR}},        // tempFactor
+        
+        // Hydrocarbon migration
+        {{HYDROCARBON_INCREMENT}},  // hydrocarbonIncrement
+        
+        // Temporal parameters
+        {{START_PAST}},         // startPast
+        {{CHECK_START}},        // checkStart
+        {{DEPOSITION_DURATION}}, // depositionDuration
+        
+        // Layer counts
+        {{DIV_LAYERS}},         // divLayers
+        {{TOR_LAYERS}},         // torLayers
+        {{EKOFISK_LAYERS}},     // ekofiskLayers
+        {{CAP_LAYERS}},         // capLayers
+        {{AB1_LAYERS}},         // ab1Layers
+        {{AB2_LAYERS}}          // ab2Layers
+    );
+
+    // Create the initial (bottom) geological unit using config
+    ShaleUnit mandal = new ShaleUnit(null, null, null, null, null, null, config.shaleSize, 1, 0.0, True, 0, config);
     List<DepositionGenerator> dl = null;
 
-    // Defines a series of DepositionGenerator objects, each describing how to deposit new units (sandstone or chalk, plus one additional shale “cap”) on top of the current column.
-    SandstoneUnit div = new SandstoneUnit(null, null, null, null, null, null, 26.5, 2, null);
-    DepositionGenerator dep = new DepositionGenerator(div, 2.0, 31);
+    // Create deposition generators using configuration values
+    SandstoneUnit div = new SandstoneUnit(null, null, null, null, null, null, config.sandstoneSize, 2, null, config);
+    DepositionGenerator dep = new DepositionGenerator(div, config.depositionDuration, config.divLayers);
     dl = new List<DepositionGenerator>(dep, dl);
 
-    SandstoneUnit tor = new ChalkUnit(null, null, null, null, null, null, 67.5, 2, null);
-    DepositionGenerator depTor = new DepositionGenerator(tor, 2.0, 5);
+    // Note: Original code has type mismatch here (SandstoneUnit tor = new ChalkUnit)
+    // Fixed to use ChalkUnit type
+    ChalkUnit tor = new ChalkUnit(null, null, null, null, null, null, config.torSize, 2, null, config);
+    DepositionGenerator depTor = new DepositionGenerator(tor, config.depositionDuration, config.torLayers);
     dl = new List<DepositionGenerator>(depTor, dl);
 
-    SandstoneUnit ekofisk = new ChalkUnit(null, null, null, null, null, null, 99.0, 2, null);
-    DepositionGenerator depEko = new DepositionGenerator(ekofisk, 2.0, 1);
+    ChalkUnit ekofisk = new ChalkUnit(null, null, null, null, null, null, config.ekofiskSize, 2, null, config);
+    DepositionGenerator depEko = new DepositionGenerator(ekofisk, config.depositionDuration, config.ekofiskLayers);
     dl = new List<DepositionGenerator>(depEko, dl);
 
-    ShaleUnit cap = new ShaleUnit(null, null, null, null, null, null, 30.0, 1, 0.0, False, 0); //mudstone is modelled as shale
-    DepositionGenerator depCap = new DepositionGenerator(cap, 2.0, 1);
+    ShaleUnit cap = new ShaleUnit(null, null, null, null, null, null, config.capSize, 1, 0.0, False, 0, config); //mudstone is modelled as shale
+    DepositionGenerator depCap = new DepositionGenerator(cap, config.depositionDuration, config.capLayers);
     dl = new List<DepositionGenerator>(depCap, dl);
 
-    SandstoneUnit ab1 = new SandstoneUnit(null, null, null, null, null, null, 186.0, 2, null);
-    DepositionGenerator depAb1 = new DepositionGenerator(ab1, 2.0, 5);
+    SandstoneUnit ab1 = new SandstoneUnit(null, null, null, null, null, null, config.ab1Size, 2, null, config);
+    DepositionGenerator depAb1 = new DepositionGenerator(ab1, config.depositionDuration, config.ab1Layers);
     dl = new List<DepositionGenerator>(depAb1, dl);
 
-    SandstoneUnit ab2 = new SandstoneUnit(null, null, null, null, null, null, 98.05, 2, null);
-    DepositionGenerator depAb2 = new DepositionGenerator(ab2, 2.0, 26);
+    SandstoneUnit ab2 = new SandstoneUnit(null, null, null, null, null, null, config.ab2Size, 2, null, config);
+    DepositionGenerator depAb2 = new DepositionGenerator(ab2, config.depositionDuration, config.ab2Layers);
     dl = new List<DepositionGenerator>(depAb2, dl);
 
-    // Run the simulation using the Driver.
+    // Run the simulation using the Driver
     dl = dl.reverse();
 
     Driver driver = new Driver(null,null);
-    driver.sim(dl, 136.0, mandal, (-66.0));
+    driver.sim(dl, config.startPast, mandal, config.checkStart);
 end

@@ -10,3 +10,11 @@
 .DS_Store
 /bin/
 /website/build/
+CLAUDE.md
+.claude
+.idea
+*.png
+*.mermaid
+*.log
+*.md
+*.pdf
